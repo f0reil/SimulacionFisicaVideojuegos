@@ -9,7 +9,7 @@
 #include "callbacks.hpp"
 
 #include "Particle.h"
-
+#include "ecs.h"
 #include <iostream>
 
 std::string display_text = "This is a test";
@@ -32,7 +32,8 @@ PxDefaultCpuDispatcher*	gDispatcher = NULL;
 PxScene*				gScene      = NULL;
 ContactReportCallback gContactReportCallback;
 
-Particle* pParticle = nullptr;
+//Particle* pParticle = nullptr;
+std::vector <Particle*> pParticles;
 
 // Initialize physics engine
 void initPhysics(bool interactive)
@@ -58,8 +59,10 @@ void initPhysics(bool interactive)
 	sceneDesc.simulationEventCallback = &gContactReportCallback;
 	gScene = gPhysics->createScene(sceneDesc);
 
+	GetCamera()->getTransform().rotate(Vector3(0, 0, 0));
+
 	// PARTICULA -----------
-	pParticle = new Particle(Vector3(0,0,0), Vector3(10,10,0));
+	//pParticle = new Particle(Vector3(0,0,0), Vector3(80,10,0), Vector3(10,0,0), 0.1);
 
 	}
 
@@ -72,7 +75,11 @@ void stepPhysics(bool interactive, double t)
 	PX_UNUSED(interactive);
 
 	// UPDATE PARTICULA
-	pParticle->integrate(t);
+	for ( Particle* n : pParticles)
+	{
+		n->integrate(t);
+	}
+	//pParticle->integrate(t);
 	
 	gScene->simulate(t);
 	gScene->fetchResults(true);
@@ -84,7 +91,11 @@ void stepPhysics(bool interactive, double t)
 void cleanupPhysics(bool interactive)
 {
 	// DESTRUCTORA PARTICULA ------
-	pParticle->~Particle();
+	for (Particle* n : pParticles)
+	{
+		n->~Particle();
+		//pParticle->~Particle();
+	}
 	PX_UNUSED(interactive);
 
 	// Rigid Body ++++++++++++++++++++++++++++++++++++++++++
@@ -112,6 +123,22 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	//case ' ':	break;
 	case ' ':
 	{
+		pParticles.push_back(new Particle(GetCamera()->getTransform().p,Vector3(GetCamera()->getDir()), 
+											proyectil::bala.vReal, 
+											 proyectil::bala.vSim, 
+											proyectil::bala.a ,proyectil::bala.d,
+											proyectil::bala.m, proyectil::g));
+		std::cout << "Bala" << std::endl;
+		break;
+	}
+	case 'C':
+	{
+		pParticles.push_back(new Particle(GetCamera()->getTransform().p, Vector3(GetCamera()->getDir()),
+			proyectil::canion.vReal,
+			proyectil::canion.vSim,
+			proyectil::canion.a, proyectil::canion.d,
+			proyectil::canion.m, proyectil::g));
+		std::cout << "Cañon" << std::endl;
 		break;
 	}
 	default:
