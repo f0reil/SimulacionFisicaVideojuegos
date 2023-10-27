@@ -9,6 +9,10 @@
 #include "callbacks.hpp"
 
 #include "Particle.h"
+#include "Firework.h"
+#include "ParticleSystem.h"
+#include "UniformParticleGenerator.h"
+#include "GaussianParticleGenerator.h"
 #include "ecs.h"
 #include <iostream>
 
@@ -32,8 +36,18 @@ PxDefaultCpuDispatcher*	gDispatcher = NULL;
 PxScene*				gScene      = NULL;
 ContactReportCallback gContactReportCallback;
 
-//Particle* pParticle = nullptr;
+// Practica proyectiles
+Particle* pParticle = nullptr;
 std::vector <Particle*> pParticles;
+
+// Sistema de particulas
+ParticleSystem* pSystem = nullptr;
+// Generador uniforme
+UniformParticleGenerator* uGenerator = nullptr;
+// Generador Gaussiano
+GaussianParticleGenerator* gausGenerator = nullptr;
+// Generador Gaussiano para firework
+GaussianParticleGenerator* gausFireworkGenerator = nullptr;
 
 // Initialize physics engine
 void initPhysics(bool interactive)
@@ -44,9 +58,9 @@ void initPhysics(bool interactive)
 
 	gPvd = PxCreatePvd(*gFoundation);
 	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
-	gPvd->connect(*transport,PxPvdInstrumentationFlag::eALL);
+	gPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
-	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(),true,gPvd);
+	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
 
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
@@ -61,10 +75,37 @@ void initPhysics(bool interactive)
 
 	GetCamera()->getTransform().rotate(Vector3(0, 0, 0));
 
-	// PARTICULA -----------
-	//pParticle = new Particle(Vector3(0,0,0), Vector3(80,10,0), Vector3(10,0,0), 0.1);
+	// SISTEMA DE PARTÍCULAS-------------------------------
+	pSystem = new ParticleSystem();
 
-	}
+	// GENERADOR UNIFORME-----------------------------------
+	uGenerator = new UniformParticleGenerator("UniformGenerator", { 0,0,500 }, { 50,1,50 }, { 0,30,0 }, {1,10,1});
+	auto modelU = models::modelsUniform[0];
+	Particle* a = new Particle({ 0,0,0 }, Vector3(0, 0, 0),
+		{ 0,0,0 }, { 0,0,0 }, modelU.damping, 1.0, 9.8, 4.0, modelU.scale, modelU.color);
+	uGenerator->setParticle(a, false);
+	a->eraseVisualModel();
+	pSystem->addGenerator(uGenerator);
+
+	// GENERADOR GAUSSIANO--------------------------------------
+	gausGenerator = new GaussianParticleGenerator("GaussianGenerator", { 0,0,300 }, { 1,50,1 }, { 10,10,1 });
+	auto modelG = models::modelsGuassian[0];
+	Particle* g = new Particle({0,0,0}, Vector3(0, 0, 0),
+		{0,0,0}, { 0,0,0 }, modelG.damping, 1.0, 9.8, 4.0, modelG.scale, modelG.color);
+	g->eraseVisualModel();
+	gausGenerator->setParticle(g, false);
+	pSystem->addGenerator(gausGenerator);
+
+	// GENERADOR GAUSSIANO PARA FIREWORKS------------------------
+	gausFireworkGenerator = new GaussianParticleGenerator("GaussianFireworkGenerator", { -100,0,0 }, { 1,50,1 }, { 1,10,1 }, 3, true);
+	auto model = models::modelsFirework[0];
+	Firework* p = new Firework(5,{ 100,100,100 }, Vector3(0, 0, 0),
+		{ 0,0,0 }, { 0,0,0 }, model.damping, 1.0, 9.8, 0.5, model.scale, model.color);
+	gausFireworkGenerator->setParticle(p, false);
+	p->eraseVisualModel();
+	pSystem->addGenerator(gausFireworkGenerator);
+
+}
 
 
 // Function to configure what happens in each step of physics
@@ -74,13 +115,9 @@ void stepPhysics(bool interactive, double t)
 {
 	PX_UNUSED(interactive);
 
-	// UPDATE PARTICULA
-	for ( Particle* n : pParticles)
-	{
-		n->integrate(t);
-	}
-	//pParticle->integrate(t);
-	
+	// UPDATE SISTEMA DE PARTICULAS---------------------------------------------------------------
+	pSystem->update(t);
+
 	gScene->simulate(t);
 	gScene->fetchResults(true);
 
@@ -90,12 +127,9 @@ void stepPhysics(bool interactive, double t)
 // Add custom code to the begining of the function
 void cleanupPhysics(bool interactive)
 {
-	// DESTRUCTORA PARTICULA ------
-	for (Particle* n : pParticles)
-	{
-		n->~Particle();
-		//pParticle->~Particle();
-	}
+	// DESTRUCTORA SISTEMA DE PARTICULAS (elimina generadores y particulas)-------------------------
+	pSystem->~ParticleSystem();
+
 	PX_UNUSED(interactive);
 
 	// Rigid Body ++++++++++++++++++++++++++++++++++++++++++
@@ -109,7 +143,6 @@ void cleanupPhysics(bool interactive)
 	
 	gFoundation->release();
 
-
 	}
 
 // Function called when a key is pressed
@@ -119,26 +152,14 @@ void keyPress(unsigned char key, const PxTransform& camera)
 
 	switch(toupper(key))
 	{
-	//case 'B': break;
-	//case ' ':	break;
 	case ' ':
 	{
-		pParticles.push_back(new Particle(GetCamera()->getTransform().p,Vector3(GetCamera()->getDir()), 
-											proyectil::bala.vReal, 
-											 proyectil::bala.vSim, 
-											proyectil::bala.a ,proyectil::bala.d,
-											proyectil::bala.m, proyectil::g));
-		std::cout << "Bala" << std::endl;
+		// Dispara el primer Firework
+		pSystem->shootFirework();
 		break;
 	}
 	case 'C':
 	{
-		pParticles.push_back(new Particle(GetCamera()->getTransform().p, Vector3(GetCamera()->getDir()),
-			proyectil::canion.vReal,
-			proyectil::canion.vSim,
-			proyectil::canion.a, proyectil::canion.d,
-			proyectil::canion.m, proyectil::g));
-		std::cout << "Cañon" << std::endl;
 		break;
 	}
 	default:
