@@ -2,7 +2,7 @@
 #include "core.hpp"
 #include "RenderUtils.hpp"
 #include <list>
-
+#include <iostream>
 class ParticleGenerator;
 
 class Particle
@@ -17,8 +17,12 @@ public:
 	bool getGeneratesOnDeath() { return generatesOnDeath; }
 	ParticleGenerator* getGenerator() { return _particle_generator; }
 	double getTimeLeft() { return remaining_time; }
-	bool insideLimits() { return pose.p.x > posI.x + 10000 || pose.p.y > posI.y + 10000 || pose.p.z > posI.z + 10000
-						|| pose.p.x < posI.x -10000 || pose.p.y < posI.y -10000|| pose.p.z < posI.z -10000; };
+	bool insideLimits( Vector3 limit) { return pose.p.x > posI.x + limit.x || pose.p.y > posI.y + limit.y || pose.p.z > posI.z + limit.z
+						|| pose.p.x < posI.x -limit.x || pose.p.y < posI.y -limit.y|| pose.p.z < posI.z -limit.z; };
+	bool insideLimits(Vector3 limit, Vector3 origin) {
+		return pose.p.x > origin.x + limit.x || pose.p.y > origin.y + limit.y || pose.p.z > origin.z + limit.z
+			|| pose.p.x < origin.x - limit.x || pose.p.y < origin.y - limit.y || pose.p.z < origin.z - limit.z;
+	};
 	inline physx::PxTransform getPos() { return pose; }
 	inline Vector3 getVel() { return velo; } 
 	inline void setPos(Vector3 p) { pose.p = p; }
@@ -33,6 +37,12 @@ public:
 			renderItem = nullptr;
 		}
 	}
+
+	inline void clearForce() { force = force * 0; };
+	inline void addForce(const Vector3& f) { force += f; };
+
+	inline double getMass() { return m; };
+	inline double getInvMass() { return 1 / m; };
 protected:
 	Vector3 velo;
 	Vector3 a;
@@ -49,6 +59,7 @@ protected:
 	int scaleP;
 	bool generatesOnDeath = false;
 
+	Vector3 force = {0,0,0};
 
 
 };

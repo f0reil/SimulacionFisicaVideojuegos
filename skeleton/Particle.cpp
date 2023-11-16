@@ -11,20 +11,20 @@ Particle::Particle(Vector3 pos, Vector3 velR, Vector3 velS, Vector3 ac,
 	if (proyectil)
 	{
 	this->velo = velS;
-	this->a = ac + Vector3(0, gravity, 0);
+	//this->a = ac + Vector3(0, gravity, 0);
 
 		// Calculamos masa simulada------------------------
 		m = mass * pow((velR.x / velS.x), 2);
 
 		// Calculamos gravedad simulada--------------------
-		gSim = -gravity * pow(velS.x / velR.x, 2);
+		//gSim = -gravity * pow(velS.x / velR.x, 2);
 	}
 	else
 	// PARTICULA
 	{
 		this->velo = velS;
-		this->a = ac;
-
+		//this->a = ac;
+		m = mass;
 	}
 	
 	this->d = damping;
@@ -42,14 +42,12 @@ Particle::Particle(Vector3 pos, Vector3 velR, Vector3 velS, Vector3 ac,
 
 void Particle::integrate(double t)
 {
+	Vector3 resulting_accel = force * (1/m);
+	velo += resulting_accel * t; 
+	velo *= powf(d, t); 
 	pose.p += velo * t;
-
-	velo += a * t;
-
-	velo *= pow(d, t);
-
 	remaining_time -= t;
-
+	clearForce();
 }
 
 Particle* Particle::clone() const

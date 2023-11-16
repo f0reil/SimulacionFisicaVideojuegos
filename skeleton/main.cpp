@@ -11,6 +11,10 @@
 #include "Particle.h"
 #include "Firework.h"
 #include "ParticleSystem.h"
+#include "GravityForceGenerator.h"
+#include "ParticleDragGenerator.h"
+#include "WhirlwindForceGenerator.h"
+#include "ExplosionForceGenerator.h"
 #include "UniformParticleGenerator.h"
 #include "GaussianParticleGenerator.h"
 #include "ecs.h"
@@ -49,6 +53,11 @@ GaussianParticleGenerator* gausGenerator = nullptr;
 // Generador Gaussiano para firework
 GaussianParticleGenerator* gausFireworkGenerator = nullptr;
 
+// GENERADORES DE FUERZA -------------------------------------------- 
+GravityForceGenerator* gravityForceGenerator = nullptr;
+ParticleDragGenerator* particleDragGenerator = nullptr;
+WhirlwindForceGenerator* whirlWindGenerator = nullptr;
+
 // Initialize physics engine
 void initPhysics(bool interactive)
 {
@@ -79,32 +88,46 @@ void initPhysics(bool interactive)
 	pSystem = new ParticleSystem();
 
 	// GENERADOR UNIFORME-----------------------------------
-	uGenerator = new UniformParticleGenerator("UniformGenerator", { 0,0,500 }, { 50,1,50 }, { 0,30,0 }, {1,10,1});
+	/*uGenerator = new UniformParticleGenerator("UniformGenerator", { 0,0,500 }, { 50,1,50 }, { 0,30,0 }, {1,10,1});
 	auto modelU = models::modelsUniform[0];
 	Particle* a = new Particle({ 0,0,0 }, Vector3(0, 0, 0),
-		{ 0,0,0 }, { 0,0,0 }, modelU.damping, 1.0, 9.8, 4.0, modelU.scale, modelU.color);
+		{ 0,0,0 }, { 0,0,0 }, modelU.damping, 10.0, 9.8, 4.0, modelU.scale, modelU.color);
 	uGenerator->setParticle(a, false);
 	a->eraseVisualModel();
-	pSystem->addGenerator(uGenerator);
+	pSystem->addGenerator(uGenerator);*/
 
 	// GENERADOR GAUSSIANO--------------------------------------
-	gausGenerator = new GaussianParticleGenerator("GaussianGenerator", { 0,0,300 }, { 1,50,1 }, { 10,10,1 });
+	gausGenerator = new GaussianParticleGenerator("GaussianGenerator", { 0,0,0 }, { 1,50,1 }, { 10,5,10 });
 	auto modelG = models::modelsGuassian[0];
 	Particle* g = new Particle({0,0,0}, Vector3(0, 0, 0),
-		{0,0,0}, { 0,0,0 }, modelG.damping, 1.0, 9.8, 4.0, modelG.scale, modelG.color);
+		{0,0,0}, { 0,0,0 }, modelG.damping, 10.0, 9.8, 4.0, modelG.scale, modelG.color);
 	g->eraseVisualModel();
 	gausGenerator->setParticle(g, false);
 	pSystem->addGenerator(gausGenerator);
 
 	// GENERADOR GAUSSIANO PARA FIREWORKS------------------------
-	gausFireworkGenerator = new GaussianParticleGenerator("GaussianFireworkGenerator", { -100,0,0 }, { 1,50,1 }, { 1,10,1 }, 3, true);
+	// DESCOMENTAR EL GENERADOR DESEADO Y AÑADIRLO AL SISTEMA DE PARTICULAS ------------------------
+	/*gausFireworkGenerator = new GaussianParticleGenerator("GaussianFireworkGenerator", { -100,0,0 }, { 1,50,1 }, { 1,10,1 }, 3, true);
 	auto model = models::modelsFirework[0];
 	Firework* p = new Firework(5,{ 100,100,100 }, Vector3(0, 0, 0),
 		{ 0,0,0 }, { 0,0,0 }, model.damping, 1.0, 9.8, 0.5, model.scale, model.color);
 	gausFireworkGenerator->setParticle(p, false);
 	p->eraseVisualModel();
-	pSystem->addGenerator(gausFireworkGenerator);
+	pSystem->addGenerator(gausFireworkGenerator);*/
 
+	// GENERADOR FUERZA GRAVITATORIA
+	gravityForceGenerator = new GravityForceGenerator(Vector3(0,-19.8,0));
+	pSystem->addForceGenerator(gravityForceGenerator);
+
+	// GENERADOR VIENTO
+	//particleDragGenerator = new ParticleDragGenerator(Vector3(0,0,200),Vector3(-20,100,0), Vector3(6000, 500, 1000), 1, 0);
+	//pSystem->addForceGenerator(particleDragGenerator);
+
+	// GENERADOR TORBELLINO
+	//whirlWindGenerator = new WhirlwindForceGenerator( 100,Vector3(0, 0, 200), Vector3(5, 0, 0), Vector3(6000, 3000, 1000), 1, 0);
+	//pSystem->addForceGenerator(whirlWindGenerator);
+
+	// GENERADOR EXPLOSION CON INPUT --> ver en metodo keypress
 }
 
 
@@ -155,11 +178,16 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	case ' ':
 	{
 		// Dispara el primer Firework
-		pSystem->shootFirework();
+		if (gausFireworkGenerator != nullptr)
+		{
+			pSystem->shootFirework();
+		}
 		break;
 	}
 	case 'C':
 	{
+		// Añade un generador de explosiones con input
+		pSystem->addExplosion();
 		break;
 	}
 	default:

@@ -17,6 +17,12 @@
     <ClCompile Include="UniformParticleGenerator.cpp" />
     <ClCompile Include="Firework.cpp" />
     <ClCompile Include="FireworkGenerator.cpp" />
+    <ClCompile Include="ParticleForceRegistry.cpp" />
+    <ClCompile Include="ForceGenerator.cpp" />
+    <ClCompile Include="GravityForceGenerator.cpp" />
+    <ClCompile Include="ParticleDragGenerator.cpp" />
+    <ClCompile Include="WhirlwindForceGenerator.cpp" />
+    <ClCompile Include="ExplosionForceGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core.hpp" />
@@ -36,10 +42,20 @@
     <ClInclude Include="UniformParticleGenerator.h" />
     <ClInclude Include="Firework.h" />
     <ClInclude Include="FireworkGenerator.h" />
+    <ClInclude Include="ParticleForceRegistry.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="ForceGenerator.h" />
+    <ClInclude Include="GravityForceGenerator.h" />
+    <ClInclude Include="ParticleDragGenerator.h" />
+    <ClInclude Include="WhirlwindForceGenerator.h" />
+    <ClInclude Include="ExplosionForceGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Render">
       <UniqueIdentifier>{d04b4f9f-5a69-465e-8070-25c6d0bcd3c2}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="game.rc" />
   </ItemGroup>
 </Project>
