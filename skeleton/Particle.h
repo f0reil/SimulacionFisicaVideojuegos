@@ -5,11 +5,13 @@
 #include <iostream>
 class ParticleGenerator;
 
+enum Geometry { Sphere, Box, Liquid};
+
 class Particle
 {
 public:
 	Particle(Vector3 pos, Vector3 velR, Vector3 velS, Vector3 ac,
-		double damping, double mass, double gravity, double timeLife,
+		double damping, double mass, double gravity, double timeLife, Geometry forma = Sphere,
 		int scale = 5, Vector4 color = { 255, 250, 0, 1 }, bool proyectil = false);
 	virtual ~Particle();
 	virtual void integrate(double t);
@@ -43,6 +45,25 @@ public:
 
 	inline double getMass() { return m; };
 	inline double getInvMass() { return 1 / m; };
+
+	inline void setMass(double mass) { m = mass; };
+
+	inline int getVolumen() 
+	{
+		int volumen;
+		switch (formaP)
+		{
+		case Box:
+			volumen = pow(scaleP, 3);
+			break;
+		case Sphere:
+			volumen = 4 / 3 * std::atan(1) * 4 * scaleP * scaleP * scaleP;
+			break;
+		default:
+			break;
+		}
+		return volumen;
+	};
 protected:
 	Vector3 velo;
 	Vector3 a;
@@ -61,6 +82,6 @@ protected:
 
 	Vector3 force = {0,0,0};
 
-
+	Geometry formaP;
 };
 

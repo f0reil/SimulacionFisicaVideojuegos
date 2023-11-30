@@ -7,7 +7,7 @@ void Firework::integrate(double t)
 }
 Particle* Firework::clone() const
 {
-	Firework* f = new Firework(g, pose.p, { 0,0,0 }, velo, {0,0,0}, d, m, gReal, timeI, scaleP, colorP);
+	Firework* f = new Firework(g, pose.p, { 0,0,0 }, velo, {0,0,0}, d, m, gReal, timeI, Sphere, scaleP, colorP);
 	return f;
 }
 void Firework::death()
@@ -21,7 +21,7 @@ void Firework::death()
 		if (scaleP > 1) scaleP=scaleP - 1;
 		// Seteamos modelo del generador
 		auto model = models::modelsFirework[rand() % models::modelsFirework.size()];
-		Firework* f = new Firework(g - 1, pose.p, { 0,0,0 }, velo, { 0,0,0 }, model.damping, m, gReal, (rand() % 100) / 100.0, model.scale, model.color);
+		Firework* f = new Firework(g - 1, pose.p, { 0,0,0 }, velo, { 0,0,0 }, model.damping, m, gReal, (rand() % 100) / 100.0, Sphere, model.scale, model.color);
 		f->eraseVisualModel();
 		_particle_generator->setParticle(f);
 	}

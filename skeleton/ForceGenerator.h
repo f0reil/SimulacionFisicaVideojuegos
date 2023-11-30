@@ -19,7 +19,7 @@ public:
 	{
 		return _t < _duration || _duration < 0.0;
 	}
-
+	inline void setDuration(double d) { _duration = d; };
 	virtual ~ForceGenerator() {};
 };
 

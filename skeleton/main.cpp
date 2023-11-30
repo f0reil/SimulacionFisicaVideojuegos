@@ -58,6 +58,8 @@ GravityForceGenerator* gravityForceGenerator = nullptr;
 ParticleDragGenerator* particleDragGenerator = nullptr;
 WhirlwindForceGenerator* whirlWindGenerator = nullptr;
 
+bool pausa = true;
+
 // Initialize physics engine
 void initPhysics(bool interactive)
 {
@@ -97,13 +99,13 @@ void initPhysics(bool interactive)
 	pSystem->addGenerator(uGenerator);*/
 
 	// GENERADOR GAUSSIANO--------------------------------------
-	gausGenerator = new GaussianParticleGenerator("GaussianGenerator", { 0,0,0 }, { 1,50,1 }, { 10,5,10 });
+	/*gausGenerator = new GaussianParticleGenerator("GaussianGenerator", {0,0,0}, {1,50,1}, {10,5,10});
 	auto modelG = models::modelsGuassian[0];
 	Particle* g = new Particle({0,0,0}, Vector3(0, 0, 0),
-		{0,0,0}, { 0,0,0 }, modelG.damping, 10.0, 9.8, 4.0, modelG.scale, modelG.color);
+		{0,0,0}, { 0,0,0 }, modelG.damping, 10.0, 9.8, 4.0, Sphere, modelG.scale, modelG.color);
 	g->eraseVisualModel();
 	gausGenerator->setParticle(g, false);
-	pSystem->addGenerator(gausGenerator);
+	pSystem->addGenerator(gausGenerator);*/
 
 	// GENERADOR GAUSSIANO PARA FIREWORKS------------------------
 	// DESCOMENTAR EL GENERADOR DESEADO Y AÑADIRLO AL SISTEMA DE PARTICULAS ------------------------
@@ -116,18 +118,21 @@ void initPhysics(bool interactive)
 	pSystem->addGenerator(gausFireworkGenerator);*/
 
 	// GENERADOR FUERZA GRAVITATORIA
-	gravityForceGenerator = new GravityForceGenerator(Vector3(0,-19.8,0));
-	pSystem->addForceGenerator(gravityForceGenerator);
+	/*gravityForceGenerator = new GravityForceGenerator(Vector3(0, -19.8, 0));
+	pSystem->addForceGenerator(gravityForceGenerator);*/
 
 	// GENERADOR VIENTO
 	//particleDragGenerator = new ParticleDragGenerator(Vector3(0,0,200),Vector3(-20,100,0), Vector3(6000, 500, 1000), 1, 0);
 	//pSystem->addForceGenerator(particleDragGenerator);
 
 	// GENERADOR TORBELLINO
-	//whirlWindGenerator = new WhirlwindForceGenerator( 100,Vector3(0, 0, 200), Vector3(5, 0, 0), Vector3(6000, 3000, 1000), 1, 0);
+	//whirlWindGenerator = new WhirlwindForceGenerator( 40,Vector3(0, 0, 200), Vector3(0, 0, 0), Vector3(6000, 3000, 1000), 1, 0);
 	//pSystem->addForceGenerator(whirlWindGenerator);
 
 	// GENERADOR EXPLOSION CON INPUT --> ver en metodo keypress
+
+	// MUELLES CON INPUT
+
 }
 
 
@@ -139,7 +144,7 @@ void stepPhysics(bool interactive, double t)
 	PX_UNUSED(interactive);
 
 	// UPDATE SISTEMA DE PARTICULAS---------------------------------------------------------------
-	pSystem->update(t);
+	if(pausa)pSystem->update(t);
 
 	gScene->simulate(t);
 	gScene->fetchResults(true);
@@ -190,6 +195,48 @@ void keyPress(unsigned char key, const PxTransform& camera)
 		pSystem->addExplosion();
 		break;
 	}
+	case 'O': {
+		pSystem->generateSpringForce();
+		break;
+	}
+	case 'L': {
+		pSystem->generateAnchoredForce();
+		break;
+	}
+	case 'B':
+		pSystem->generateBuoyancyForce();
+		// GENERADOR FUERZA GRAVITATORIA
+		gravityForceGenerator = new GravityForceGenerator(Vector3(0, -9.8, 0));
+		pSystem->addForceGenerator(gravityForceGenerator, true);
+		std::cout << "Gravedad activada\n";
+		break;
+	case 'G':
+		// GENERADOR FUERZA GRAVITATORIA
+		gravityForceGenerator = new GravityForceGenerator(Vector3(0, -9.8, 0));
+		pSystem->addForceGenerator(gravityForceGenerator, true);
+		std::cout << "Gravedad activada\n";
+		break;
+	case 'Q':
+		particleDragGenerator = new ParticleDragGenerator(Vector3(0,0,20),Vector3(-20,100,0), Vector3(6000, 500, 1000), 1, 0);
+	    pSystem->addForceGenerator(particleDragGenerator, true);
+		particleDragGenerator->setDuration(3);
+		break;
+	case 'K':
+		if (!pausa)
+		{
+			int k1, k2;
+			std::cout << "Setea K SpringFG_1:\n ";
+			std::cin >> k1;
+			pSystem->getSprinFG_1()->setK(k1);
+
+			std::cout << "Setea K SpringFG_2:\n ";
+			std::cin >> k2;
+			pSystem->getSprinFG_2()->setK(k2);
+		}
+		break;
+	case 'P':
+		pausa = !pausa;
+		break;
 	default:
 		break;
 	}

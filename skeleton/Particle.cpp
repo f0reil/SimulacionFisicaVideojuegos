@@ -2,8 +2,9 @@
 #include "ParticleGenerator.h"
 #include <iostream>
 Particle::Particle(Vector3 pos, Vector3 velR, Vector3 velS, Vector3 ac,
-	double damping, double mass, double gravity, double timeLife, int scale, Vector4 color, bool proyectil)
+	double damping, double mass, double gravity, double timeLife, Geometry forma, int scale, Vector4 color, bool proyectil)
 {
+	formaP = forma;
 	scaleP = scale;
 	colorP = color;
 
@@ -31,8 +32,21 @@ Particle::Particle(Vector3 pos, Vector3 velR, Vector3 velS, Vector3 ac,
 
 	// Creamos la particula con forma de esfera con un color y una posición-----------------
 	pose = physx::PxTransform(pos);
-	physx::PxSphereGeometry sphere(scaleP);
-	physx::PxShape* shape = CreateShape(sphere);
+
+	physx::PxShape* shape;
+	switch (forma)
+	{
+	case Sphere:
+		shape = CreateShape(physx::PxSphereGeometry (scaleP));
+		break;
+	case Box:
+		shape = CreateShape(physx::PxBoxGeometry (Vector3(scaleP, scaleP, scaleP)));
+		break;
+	case Liquid:
+		shape = CreateShape(physx::PxBoxGeometry(Vector3(20, 1, 10)));
+		colorP = Vector4(0,255,255,1);
+		break;
+	}
 	renderItem = new RenderItem(shape, &pose, colorP);
 
 	timeI = remaining_time = timeLife;
@@ -52,7 +66,7 @@ void Particle::integrate(double t)
 
 Particle* Particle::clone() const
 {
-	Particle* p = new Particle(pose.p, { 0,0,0 }, velo, {0,0,0}, d, m, gReal, timeI, scaleP, colorP);
+	Particle* p = new Particle(pose.p, { 0,0,0 }, velo, {0,0,0}, d, m, gReal, timeI, Sphere, scaleP, colorP);
 	return p;
 }
 
