@@ -1,6 +1,6 @@
 #include "ParticleGenerator.h"
 
-void ParticleGenerator::setParticle(Particle* p, bool modify_pos_vel)
+void ParticleGenerator::setParticle(Entity* p, bool modify_pos_vel)
 {
 	if(_model != nullptr) delete _model;
 	_model = p->clone();

@@ -1,6 +1,6 @@
 #include "BouyancyForceGenerator.h"
 
-void BouyancyForceGenerator::updateForce(Particle* particle, double t)
+void BouyancyForceGenerator::updateForce(Entity* particle, double t)
 {
 	float h = particle->getPos().p.y;
 	float h0 = _liquid_particle->getPos().p.y;

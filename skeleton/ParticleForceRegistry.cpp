@@ -8,12 +8,12 @@ void ParticleForceRegistry::updateForces(double duration)
 	}
 }
 
-void ParticleForceRegistry::addRegistry(ForceGenerator* fg, Particle* p)
+void ParticleForceRegistry::addRegistry(ForceGenerator* fg, Entity* p)
 {
 	emplace(p,fg);
 }
 
-void ParticleForceRegistry::deleteParticleRegistry(Particle* p)
+void ParticleForceRegistry::deleteParticleRegistry(Entity* p)
 {
 	erase(p);
 }

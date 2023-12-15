@@ -12,7 +12,7 @@ ParticleDragGenerator::ParticleDragGenerator(Vector3 wVel, Vector3 pOrigin, Vect
 	setDrag(k1, k2);
 }
 
-void ParticleDragGenerator::updateForce(Particle* p, double t)
+void ParticleDragGenerator::updateForce(Entity* p, double t)
 {
 	if (fabs(p->getInvMass() < 1e-10)) return;
 

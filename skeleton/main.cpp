@@ -9,6 +9,7 @@
 #include "callbacks.hpp"
 
 #include "Particle.h"
+#include "RigidSolid.h"
 #include "Firework.h"
 #include "ParticleSystem.h"
 #include "GravityForceGenerator.h"
@@ -41,8 +42,8 @@ PxScene*				gScene      = NULL;
 ContactReportCallback gContactReportCallback;
 
 // Practica proyectiles
-Particle* pParticle = nullptr;
-std::vector <Particle*> pParticles;
+Entity* pParticle = nullptr;
+std::vector <Entity*> pParticles;
 
 // Sistema de particulas
 ParticleSystem* pSystem = nullptr;
@@ -50,6 +51,7 @@ ParticleSystem* pSystem = nullptr;
 UniformParticleGenerator* uGenerator = nullptr;
 // Generador Gaussiano
 GaussianParticleGenerator* gausGenerator = nullptr;
+GaussianParticleGenerator* gausGenerator2 = nullptr;
 // Generador Gaussiano para firework
 GaussianParticleGenerator* gausFireworkGenerator = nullptr;
 
@@ -59,6 +61,12 @@ ParticleDragGenerator* particleDragGenerator = nullptr;
 WhirlwindForceGenerator* whirlWindGenerator = nullptr;
 
 bool pausa = true;
+
+// SOLIDO RIGIDO ------------------------------------------------------
+// Suelo
+physx::PxRigidStatic* _staticFloor = nullptr;
+RenderItem* floorRenderItem;
+
 
 // Initialize physics engine
 void initPhysics(bool interactive)
@@ -98,7 +106,7 @@ void initPhysics(bool interactive)
 	a->eraseVisualModel();
 	pSystem->addGenerator(uGenerator);*/
 
-	// GENERADOR GAUSSIANO--------------------------------------
+	// GENERADOR GAUSSIANO-------------------------------------- PARTICULA
 	/*gausGenerator = new GaussianParticleGenerator("GaussianGenerator", {0,0,0}, {1,50,1}, {10,5,10});
 	auto modelG = models::modelsGuassian[0];
 	Particle* g = new Particle({0,0,0}, Vector3(0, 0, 0),
@@ -130,8 +138,44 @@ void initPhysics(bool interactive)
 	//pSystem->addForceGenerator(whirlWindGenerator);
 
 	// GENERADOR EXPLOSION CON INPUT --> ver en metodo keypress
-
 	// MUELLES CON INPUT
+
+	// SOLIDO RIGIDO ----------------------------------------------------------------------------------
+	_staticFloor = gPhysics->createRigidStatic(physx::PxTransform({0,0,0}));
+	physx::PxShape* shape;
+	shape = CreateShape(physx::PxBoxGeometry(Vector3(200, 0.5, 200)));
+	_staticFloor->attachShape(*shape);
+	gScene->addActor(*_staticFloor);
+	floorRenderItem = new RenderItem(shape, _staticFloor, Vector4(255, 255, 0, 1));
+
+	// Generador Gausiano ---------------------------------------------------------------------
+	gausGenerator = new GaussianParticleGenerator("GaussianGenerator", {100,0,100}, {1,50,1}, {8,3,8}, 200, false, 0.05);
+	auto modelG = models::modelsGuassian[0];
+	RigidSolid* g = new RigidSolid(Vector3(50,10,50), Dynamic, 10, gPhysics, gScene, 1000, Sphere, modelG.scale, modelG.color);
+	g->eraseVisualModel();
+	gausGenerator->setParticle(g, false);
+	pSystem->addGenerator(gausGenerator);
+
+	// Generador Gausiano con torbellino -------------------------------------------------------
+	/*gausGenerator2 = new GaussianParticleGenerator("GaussianGenerator", {-150,0,-150}, {1,50,1}, {8,3,8}, 200, false, 0.05);
+	auto modelG2 = models::modelsGuassian[0];
+	RigidSolid* g2 = new RigidSolid(Vector3(50, 10, 50), Dynamic, 10, gPhysics, gScene, 1000, Sphere, modelG2.scale, modelG2.color);
+	g2->eraseVisualModel();
+	gausGenerator2->setParticle(g2, false);
+	pSystem->addGenerator(gausGenerator2);
+
+	whirlWindGenerator = new WhirlwindForceGenerator(40, Vector3(0, 0, 200), Vector3(-150, 0, -150), Vector3(10, 100, 10), 1, 0);
+	pSystem->addForceGenerator(whirlWindGenerator);*/
+
+
+	//Generador uniforme -----------------------------------------------------------------------
+	uGenerator = new UniformParticleGenerator("UniformGenerator", { 0,20,0 }, { 50,1,50 }, { 0,35,0 }, { 1,10,1 });
+	auto modelU = models::modelsUniform[0];
+	RigidSolid* u = new RigidSolid(Vector3(0, 10, 0), Dynamic, 10, gPhysics, gScene, 10, Box, modelU.scale, modelU.color);
+	uGenerator->setParticle(u, false);
+	u->eraseVisualModel();
+	pSystem->addGenerator(uGenerator);
+
 
 }
 
@@ -217,7 +261,7 @@ void keyPress(unsigned char key, const PxTransform& camera)
 		std::cout << "Gravedad activada\n";
 		break;
 	case 'Q':
-		particleDragGenerator = new ParticleDragGenerator(Vector3(0,0,20),Vector3(-20,100,0), Vector3(6000, 500, 1000), 1, 0);
+		particleDragGenerator = new ParticleDragGenerator(Vector3(0,0,100),Vector3(-20,100,0), Vector3(6000, 500, 1000), 1, 0);
 	    pSystem->addForceGenerator(particleDragGenerator, true);
 		particleDragGenerator->setDuration(3);
 		break;

@@ -3,9 +3,9 @@
 #include "ecs.h"
 void Firework::integrate(double t)
 {
-	Particle::integrate(t);
+	Entity::integrate(t);
 }
-Particle* Firework::clone() const
+Entity* Firework::clone() const
 {
 	Firework* f = new Firework(g, pose.p, { 0,0,0 }, velo, {0,0,0}, d, m, gReal, timeI, Sphere, scaleP, colorP);
 	return f;

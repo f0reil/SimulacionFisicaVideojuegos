@@ -1,6 +1,6 @@
 #include "ExplosionForceGenerator.h"
 
-void ExplosionForceGenerator::updateForce(Particle* particle, double t)
+void ExplosionForceGenerator::updateForce(Entity* particle, double t)
 {
 	Vector3 pPos = particle->getPos().p;
 	Vector3 dir = pPos - _centro;

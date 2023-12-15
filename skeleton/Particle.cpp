@@ -3,11 +3,8 @@
 #include <iostream>
 Particle::Particle(Vector3 pos, Vector3 velR, Vector3 velS, Vector3 ac,
 	double damping, double mass, double gravity, double timeLife, Geometry forma, int scale, Vector4 color, bool proyectil)
+	: Entity (timeLife, forma, scale, color)
 {
-	formaP = forma;
-	scaleP = scale;
-	colorP = color;
-
 	// PROYECTIL-------------------
 	if (proyectil)
 	{
@@ -33,21 +30,7 @@ Particle::Particle(Vector3 pos, Vector3 velR, Vector3 velS, Vector3 ac,
 	// Creamos la particula con forma de esfera con un color y una posición-----------------
 	pose = physx::PxTransform(pos);
 
-	physx::PxShape* shape;
-	switch (forma)
-	{
-	case Sphere:
-		shape = CreateShape(physx::PxSphereGeometry (scaleP));
-		break;
-	case Box:
-		shape = CreateShape(physx::PxBoxGeometry (Vector3(scaleP, scaleP, scaleP)));
-		break;
-	case Liquid:
-		shape = CreateShape(physx::PxBoxGeometry(Vector3(20, 1, 10)));
-		colorP = Vector4(0,255,255,1);
-		break;
-	}
-	renderItem = new RenderItem(shape, &pose, colorP);
+	renderItem = new RenderItem(entShape, &pose, colorP);
 
 	timeI = remaining_time = timeLife;
 
@@ -60,29 +43,22 @@ void Particle::integrate(double t)
 	velo += resulting_accel * t; 
 	velo *= powf(d, t); 
 	pose.p += velo * t;
-	remaining_time -= t;
-	clearForce();
+	Entity::integrate(t);
+	
 }
 
-Particle* Particle::clone() const
+Entity* Particle::clone() const
 {
-	Particle* p = new Particle(pose.p, { 0,0,0 }, velo, {0,0,0}, d, m, gReal, timeI, Sphere, scaleP, colorP);
+	Entity* p = new Particle(pose.p, { 0,0,0 }, velo, {0,0,0}, d, m, gReal, timeI, Sphere, scaleP, colorP);
 	return p;
 }
 
-std::list<Particle*> Particle::getGeneratedParticles()
+std::list<Entity*> Particle::getGeneratedParticles()
 {
 	return _particle_generator->generateParticles();
 }
 
 Particle::~Particle()
 {
-	if (renderItem != nullptr)
-	{
-		renderItem->release();
-	}
-	if (_particle_generator != nullptr)
-	{
-		delete(_particle_generator);
-	}
+	
 }

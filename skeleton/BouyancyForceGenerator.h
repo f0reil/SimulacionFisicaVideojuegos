@@ -5,9 +5,9 @@
 class BouyancyForceGenerator: public ForceGenerator
 {
 public: 
-	BouyancyForceGenerator(float h, float v, float d, Particle* l) :
+	BouyancyForceGenerator(float h, float v, float d, Entity* l) :
 		ForceGenerator(), _height(h), _volumen(v), _liquid_density(d), _liquid_particle(l) {};
-	virtual void updateForce(Particle* particle, double t);
+	virtual void updateForce(Entity* particle, double t);
 
 	virtual ~BouyancyForceGenerator();
 
@@ -17,6 +17,6 @@ protected:
 	float _liquid_density;
 	float _gravity = 9.8;
 
-	Particle* _liquid_particle;
+	Entity* _liquid_particle;
 };
 

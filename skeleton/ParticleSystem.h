@@ -35,17 +35,17 @@ public:
 		_force_generators.push_back(f);
 		if (add)
 		{
-			for (Particle* p : _particles)
+			for (Entity* p : _particles)
 			{
 				_particle_force_registry->addRegistry(f, p);
 			}
 		}
 	}
-	inline void addParticlesToRegistry(std::list<Particle*>& listP)
+	inline void addParticlesToRegistry(std::list<Entity*>& listP)
 	{
 		for (ForceGenerator* f : _force_generators)
 		{
-			for (Particle* p : listP)
+			for (Entity* p : listP)
 			{
 				_particle_force_registry->addRegistry(f, p);
 			}
@@ -55,19 +55,20 @@ public:
 	{
 		explosionForceGenerator = new ExplosionForceGenerator(Vector3(0,30,0), 50, 10000, 20, 3);
 		addForceGenerator(explosionForceGenerator);
-		for (Particle* p : _particles)
+		for (Entity* p : _particles)
 		{
 			_particle_force_registry->addRegistry(explosionForceGenerator, p);
 		}
 	}
 	void generateSpringForce();
+	void generateSpringForceRigidSolid(physx::PxPhysics* gPhysics, physx::PxScene* gScene);
 	void generateAnchoredForce();
 	void generateBuoyancyForce();
 
 	inline SpringForceGenerator* getSprinFG_1() { return f1; };
 	inline SpringForceGenerator* getSprinFG_2() { return f2; };
 private:
-	std::list<Particle*> _particles;
+	std::list<Entity*> _particles;
 	std::list<ParticleGenerator*> _particles_generator;
 	std::unordered_map<std::string, ParticleGenerator*> _pGenerator_map;
 

@@ -1,11 +1,11 @@
 #include "SpringForceGenerator.h"
 
-SpringForceGenerator::SpringForceGenerator(double k, double resting_lenght, Particle* other) 
+SpringForceGenerator::SpringForceGenerator(double k, double resting_lenght, Entity* other) 
 	: ForceGenerator(), _k(k), _resting_lenght(resting_lenght), _other(other)
 {
 }
 
-void SpringForceGenerator::updateForce(Particle* particle, double t)
+void SpringForceGenerator::updateForce(Entity* particle, double t)
 {
 	Vector3 relative_pos_vector = _other->getPos().p - particle->getPos().p;
 	Vector3 force;

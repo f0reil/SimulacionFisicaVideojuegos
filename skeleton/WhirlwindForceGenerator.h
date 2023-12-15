@@ -8,7 +8,7 @@ public:
 		: k(k),ParticleDragGenerator(wVel, pOrigin, limits, k1, k2) {};
 	~WhirlwindForceGenerator() {};
 
-	virtual void updateForce(Particle* p, double t);
+	virtual void updateForce(Entity* p, double t);
 
 protected:
 	int k = 0;

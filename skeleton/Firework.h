@@ -15,7 +15,7 @@ public:
 
 	virtual void integrate(double t);
 
-	virtual Particle* clone() const;
+	virtual Entity* clone() const;
 	virtual void death();
 
 private: 

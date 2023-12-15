@@ -12,7 +12,7 @@ public:
 		{}
 	~FireworkGenerator() {}
 
-	virtual std::list<Particle*> generateParticles();
+	virtual std::list<Entity*> generateParticles();
 
 	inline bool getDestroy() { return destroy; };
 	inline void setDestroy(bool d) { destroy = d; };

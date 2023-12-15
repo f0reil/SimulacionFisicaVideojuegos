@@ -10,7 +10,7 @@ public:
 	{
 		_duration = duration;
 	};
-	virtual void updateForce(Particle* particle, double t);
+	virtual void updateForce(Entity* particle, double t);
 
 protected:
 	Vector3 _centro = { 0,0,0 };
