@@ -32,6 +32,8 @@
 #include "Camera.h"
 #include <ctype.h>
 #include "foundation/PxMat33.h"
+#include "../core.hpp"
+#include <iostream>
 
 using namespace physx;
 
@@ -62,10 +64,10 @@ bool Camera::handleKey(unsigned char key, int x, int y, float speed)
 	PxVec3 viewY = mDir.cross(PxVec3(0,1,0)).getNormalized();
 	switch(toupper(key))
 	{
-	case 'W':	mEye += mDir*2.0f*speed;		break;
+	/*case 'W':	mEye += mDir*2.0f*speed;		break;
 	case 'S':	mEye -= mDir*2.0f*speed;		break;
 	case 'A':	mEye -= viewY*2.0f*speed;		break;
-	case 'D':	mEye += viewY*2.0f*speed;		break;
+	case 'D':	mEye += viewY*2.0f*speed;		break;*/
 	default:							return false;
 	}
 	return true;
@@ -73,14 +75,14 @@ bool Camera::handleKey(unsigned char key, int x, int y, float speed)
 
 void Camera::handleAnalogMove(float x, float y)
 {
-	PxVec3 viewY = mDir.cross(PxVec3(0,1,0)).getNormalized();
+	/*PxVec3 viewY = mDir.cross(PxVec3(0,1,0)).getNormalized();
 	mEye += mDir*y;
-	mEye += viewY*x;
+	mEye += viewY*x;*/
 }
 
 void Camera::handleMotion(int x, int y)
 {
-	int dx = mMouseX - x;
+	/*int dx = mMouseX - x;
 	int dy = mMouseY - y;
 
 	PxVec3 viewY = mDir.cross(PxVec3(0,1,0)).getNormalized();
@@ -93,7 +95,7 @@ void Camera::handleMotion(int x, int y)
 	mDir.normalize();
 
 	mMouseX = x;
-	mMouseY = y;
+	mMouseY = y;*/
 }
 
 PxTransform Camera::getTransform() const
@@ -117,6 +119,14 @@ PxVec3 Camera::getDir() const
 	return mDir; 
 }
 
+physx::PxVec2 Camera::getMousePos() {
+
+	float x = (2.0f * mMouseX) / glutGet(GLUT_WINDOW_WIDTH) - 1.0f;
+	float y = 1.0f - (2.0f * mMouseY) / glutGet(GLUT_WINDOW_HEIGHT);
+	float viewX = x * 5.0f;
+	float viewY = y * 3.0f;
+	return { (float)viewX , (float)viewY };
+}
 
 }
 

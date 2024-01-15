@@ -64,6 +64,7 @@ void keyboardCallback(unsigned char key, int x, int y)
 void mouseCallback(int button, int state, int x, int y)
 {
 	sCamera->handleMouse(button, state, x, y);
+	mouseInput(button, state, x, y);
 }
 
 void idleCallback()
@@ -137,9 +138,9 @@ void exitCallback(void)
 void renderLoop()
 {
 	StartCounter();
-	sCamera = new Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f,-0.2f,-0.7f));
+	sCamera = new Camera(PxVec3(0.0f, 0.0f, 0.0f), PxVec3(0.0f,0.0f,-1.0f));
 
-	setupDefaultWindow("Simulacion Fisica Videojuegos");
+	setupDefaultWindow("Proyecto Final - Paula Lopez Roman");
 	setupDefaultRenderState();
 
 	glutIdleFunc(idleCallback);

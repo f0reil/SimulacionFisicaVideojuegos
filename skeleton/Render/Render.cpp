@@ -255,6 +255,8 @@ void setupDefaultWindow(const char *name)
 	glutSetWindow(mainHandle);
 	glutReshapeFunc(reshapeCallback);
 	
+	glutFullScreen();
+
 	delete[] namestr;
 }
 
@@ -286,9 +288,25 @@ void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNe
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Display text
-	glColor4f(1.0f, 0.2f, 0.2f, 1.0f);
+	// Display text, siempre lo renderizamos
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 	drawText(display_text, 0, 0);
+
+	// Render de los estados del juego
+	switch (estadoJuego)
+	{
+	case Intro:
+		renderIntro();
+		break;
+	case Juego:
+		renderHUD();
+		break;
+	case Final:
+		renderEnd();
+		break;
+	default:
+		break;
+	}
 
 	// Setup camera
 	glMatrixMode(GL_PROJECTION);
@@ -406,6 +424,38 @@ void drawText(const std::string& text, int x, int y)
 	glMatrixMode(GL_MODELVIEW);
 }
 
+void renderIntro()
+{
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	drawText("¡Bienvenido a Campo de Tiro!", 220, 350);
+	drawText("Acierta a todos los blancos posibles y gana la mayor puntuación.", 160, 335);
+	glColor4f(7.0f, 0.0f, 7.0f, 1.0f);
+	drawText("CLICK PARA EMPEZAR", 230, 130);
+}
+
+void renderHUD()
+{
+	glColor4f(0.0f, 8.0f, 0.0f, 1.0f);
+	drawText("Score: " + std::to_string(score), 10, 490);
+	drawText("Tiempo: " + std::to_string((int)tiempoRestante), 480, 490);
+
+	/*if (rifleSelected) glColor4f(7.0f, 0.0f, 0.0f, 1.0f);
+	else glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+	drawText("RIFLE", 20, 45);
+
+	if (!rifleSelected) glColor4f(7.0f, 0.0f, 0.0f, 1.0f);
+	else glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+	drawText("SHOTGUN", 20, 30);*/
+}
+
+void renderEnd()
+{
+	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+	drawText("¡Se acabo el tiempo!", 220, 350);
+	drawText("Puntuacion: " + std::to_string(score), 160, 335);
+	glColor4f(7.0f, 0.0f, 7.0f, 1.0f);
+	drawText("CLICK PARA VOLVER A JUGAR", 230, 130);
+}
 
 
 } //namespace Snippets

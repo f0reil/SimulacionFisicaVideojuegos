@@ -20,9 +20,9 @@
 #include "GaussianParticleGenerator.h"
 #include "ecs.h"
 #include <iostream>
+#include "estados.h"
 
-std::string display_text = "This is a test";
-
+std::string display_text = "Campo de Tiro - Proyecto Final, Paula Lopez";
 
 using namespace physx;
 
@@ -41,32 +41,29 @@ PxDefaultCpuDispatcher*	gDispatcher = NULL;
 PxScene*				gScene      = NULL;
 ContactReportCallback gContactReportCallback;
 
-// Practica proyectiles
-Entity* pParticle = nullptr;
-std::vector <Entity*> pParticles;
-
-// Sistema de particulas
-ParticleSystem* pSystem = nullptr;
-// Generador uniforme
-UniformParticleGenerator* uGenerator = nullptr;
-// Generador Gaussiano
-GaussianParticleGenerator* gausGenerator = nullptr;
-GaussianParticleGenerator* gausGenerator2 = nullptr;
-// Generador Gaussiano para firework
-GaussianParticleGenerator* gausFireworkGenerator = nullptr;
-
-// GENERADORES DE FUERZA -------------------------------------------- 
-GravityForceGenerator* gravityForceGenerator = nullptr;
-ParticleDragGenerator* particleDragGenerator = nullptr;
-WhirlwindForceGenerator* whirlWindGenerator = nullptr;
-
-bool pausa = true;
 
 // SOLIDO RIGIDO ------------------------------------------------------
 // Suelo
 physx::PxRigidStatic* _staticFloor = nullptr;
 RenderItem* floorRenderItem;
 
+// PROYECTO FINAL ---------------------------------------------------
+// Variables flujo de juego
+Estados estadoJuego = Intro;
+int score = 0;
+// Sistema de particulas
+ParticleSystem* pSystem = nullptr;
+// Generadores de fuerza -------------------------------------------- 
+GravityForceGenerator* gravityForceGenerator = nullptr;
+// Lista de balas
+std::list<Entity*> bulletList;
+// Cooldown balas
+bool canShoot = false;
+float cooldownShoot = 0.25f;
+float timer = 0.0f;
+// Tiempo de juego
+const double tiempoPartida = 10;
+double tiempoRestante = tiempoPartida;
 
 // Initialize physics engine
 void initPhysics(bool interactive)
@@ -97,88 +94,25 @@ void initPhysics(bool interactive)
 	// SISTEMA DE PARTÍCULAS-------------------------------
 	pSystem = new ParticleSystem();
 
-	// GENERADOR UNIFORME-----------------------------------
-	/*uGenerator = new UniformParticleGenerator("UniformGenerator", { 0,0,500 }, { 50,1,50 }, { 0,30,0 }, {1,10,1});
-	auto modelU = models::modelsUniform[0];
-	Particle* a = new Particle({ 0,0,0 }, Vector3(0, 0, 0),
-		{ 0,0,0 }, { 0,0,0 }, modelU.damping, 10.0, 9.8, 4.0, modelU.scale, modelU.color);
-	uGenerator->setParticle(a, false);
-	a->eraseVisualModel();
-	pSystem->addGenerator(uGenerator);*/
+}
 
-	// GENERADOR GAUSSIANO-------------------------------------- PARTICULA
-	/*gausGenerator = new GaussianParticleGenerator("GaussianGenerator", {0,0,0}, {1,50,1}, {10,5,10});
-	auto modelG = models::modelsGuassian[0];
-	Particle* g = new Particle({0,0,0}, Vector3(0, 0, 0),
-		{0,0,0}, { 0,0,0 }, modelG.damping, 10.0, 9.8, 4.0, Sphere, modelG.scale, modelG.color);
-	g->eraseVisualModel();
-	gausGenerator->setParticle(g, false);
-	pSystem->addGenerator(gausGenerator);*/
-
-	// GENERADOR GAUSSIANO PARA FIREWORKS------------------------
-	// DESCOMENTAR EL GENERADOR DESEADO Y AÑADIRLO AL SISTEMA DE PARTICULAS ------------------------
-	/*gausFireworkGenerator = new GaussianParticleGenerator("GaussianFireworkGenerator", { -100,0,0 }, { 1,50,1 }, { 1,10,1 }, 3, true);
-	auto model = models::modelsFirework[0];
-	Firework* p = new Firework(5,{ 100,100,100 }, Vector3(0, 0, 0),
-		{ 0,0,0 }, { 0,0,0 }, model.damping, 1.0, 9.8, 0.5, model.scale, model.color);
-	gausFireworkGenerator->setParticle(p, false);
-	p->eraseVisualModel();
-	pSystem->addGenerator(gausFireworkGenerator);*/
-
-	// GENERADOR FUERZA GRAVITATORIA
-	/*gravityForceGenerator = new GravityForceGenerator(Vector3(0, -19.8, 0));
-	pSystem->addForceGenerator(gravityForceGenerator);*/
-
-	// GENERADOR VIENTO
-	//particleDragGenerator = new ParticleDragGenerator(Vector3(0,0,200),Vector3(-20,100,0), Vector3(6000, 500, 1000), 1, 0);
-	//pSystem->addForceGenerator(particleDragGenerator);
-
-	// GENERADOR TORBELLINO
-	//whirlWindGenerator = new WhirlwindForceGenerator( 40,Vector3(0, 0, 200), Vector3(0, 0, 0), Vector3(6000, 3000, 1000), 1, 0);
-	//pSystem->addForceGenerator(whirlWindGenerator);
-
-	// GENERADOR EXPLOSION CON INPUT --> ver en metodo keypress
-	// MUELLES CON INPUT
-
-	// SOLIDO RIGIDO ----------------------------------------------------------------------------------
-	_staticFloor = gPhysics->createRigidStatic(physx::PxTransform({0,0,0}));
-	physx::PxShape* shape;
-	shape = CreateShape(physx::PxBoxGeometry(Vector3(200, 0.5, 200)));
-	_staticFloor->attachShape(*shape);
-	gScene->addActor(*_staticFloor);
-	floorRenderItem = new RenderItem(shape, _staticFloor, Vector4(255, 255, 0, 1));
-
-	// Generador Gausiano ---------------------------------------------------------------------
-	gausGenerator = new GaussianParticleGenerator("GaussianGenerator", {100,0,100}, {1,50,1}, {8,3,8}, 200, false, 0.05);
-	auto modelG = models::modelsGuassian[0];
-	RigidSolid* g = new RigidSolid(Vector3(50,10,50), Dynamic, 10, gPhysics, gScene, 1000, Sphere, modelG.scale, modelG.color);
-	g->eraseVisualModel();
-	gausGenerator->setParticle(g, false);
-	pSystem->addGenerator(gausGenerator);
-
-	// Generador Gausiano con torbellino -------------------------------------------------------
-	/*gausGenerator2 = new GaussianParticleGenerator("GaussianGenerator", {-150,0,-150}, {1,50,1}, {8,3,8}, 200, false, 0.05);
-	auto modelG2 = models::modelsGuassian[0];
-	RigidSolid* g2 = new RigidSolid(Vector3(50, 10, 50), Dynamic, 10, gPhysics, gScene, 1000, Sphere, modelG2.scale, modelG2.color);
-	g2->eraseVisualModel();
-	gausGenerator2->setParticle(g2, false);
-	pSystem->addGenerator(gausGenerator2);
-
-	whirlWindGenerator = new WhirlwindForceGenerator(40, Vector3(0, 0, 200), Vector3(-150, 0, -150), Vector3(10, 100, 10), 1, 0);
-	pSystem->addForceGenerator(whirlWindGenerator);*/
-
-
-	//Generador uniforme -----------------------------------------------------------------------
-	uGenerator = new UniformParticleGenerator("UniformGenerator", { 0,20,0 }, { 50,1,50 }, { 0,35,0 }, { 1,10,1 });
+void setupGaussianGenerator()
+{
+	// Generador uniforme
+	UniformParticleGenerator* uGenerator = nullptr;
+	uGenerator = new UniformParticleGenerator("UniformGenerator", { 0,-20,-100 }, { 150,1,30 }, { 0,35,0 }, { 1,100,1 }, 800, false);
 	auto modelU = models::modelsUniform[0];
 	RigidSolid* u = new RigidSolid(Vector3(0, 10, 0), Dynamic, 10, gPhysics, gScene, 10, Box, modelU.scale, modelU.color);
 	uGenerator->setParticle(u, false);
 	u->eraseVisualModel();
 	pSystem->addGenerator(uGenerator);
-
-
 }
 
+void createBouyancyObstacles()
+{
+	// Creamos los obstaculos flotantes del escenario
+	pSystem->generateBuoyancyForce(gPhysics, gScene);
+}
 
 // Function to configure what happens in each step of physics
 // interactive: true if the game is rendering, false if it offline
@@ -188,8 +122,30 @@ void stepPhysics(bool interactive, double t)
 	PX_UNUSED(interactive);
 
 	// UPDATE SISTEMA DE PARTICULAS---------------------------------------------------------------
-	if(pausa)pSystem->update(t);
-
+	pSystem->update(t, bulletList, score);
+	
+	// Si estamos en el estado de la partida, vamos disminuyendo el tiempo
+	if (estadoJuego == Juego)
+	{
+		tiempoRestante -= t;
+		// COOLDOWN BALAS -----------------------------------------
+		if (canShoot == false) {
+			timer += t;
+			// Cuando el timer iguale al tiempo del cooldown, reseteamos timer y activamos disparo
+			if (timer >= cooldownShoot) {
+				timer = 0;
+				canShoot = true;
+			}
+		}
+	}
+	// Cuando la partida termina, reseteamos el tiempo, borramos las instancias y lanzamos fuegos artificales
+	if (tiempoRestante <= 0)
+	{
+		tiempoRestante = tiempoPartida;
+		estadoJuego = Final;
+		pSystem->deleteParticles();
+		pSystem->Fireworks();
+	}
 	gScene->simulate(t);
 	gScene->fetchResults(true);
 
@@ -221,68 +177,12 @@ void cleanupPhysics(bool interactive)
 void keyPress(unsigned char key, const PxTransform& camera)
 {
 	PX_UNUSED(camera);
-
 	switch(toupper(key))
 	{
-	case ' ':
-	{
-		// Dispara el primer Firework
-		if (gausFireworkGenerator != nullptr)
-		{
-			pSystem->shootFirework();
-		}
-		break;
-	}
-	case 'C':
-	{
-		// Añade un generador de explosiones con input
-		pSystem->addExplosion();
-		break;
-	}
-	case 'O': {
-		pSystem->generateSpringForce();
-		break;
-	}
-	case 'L': {
-		pSystem->generateAnchoredForce();
-		break;
-	}
-	case 'B':
-		pSystem->generateBuoyancyForce();
-		// GENERADOR FUERZA GRAVITATORIA
-		gravityForceGenerator = new GravityForceGenerator(Vector3(0, -9.8, 0));
-		pSystem->addForceGenerator(gravityForceGenerator, true);
-		std::cout << "Gravedad activada\n";
-		break;
-	case 'G':
-		// GENERADOR FUERZA GRAVITATORIA
-		gravityForceGenerator = new GravityForceGenerator(Vector3(0, -9.8, 0));
-		pSystem->addForceGenerator(gravityForceGenerator, true);
-		std::cout << "Gravedad activada\n";
-		break;
-	case 'Q':
-		particleDragGenerator = new ParticleDragGenerator(Vector3(0,0,100),Vector3(-20,100,0), Vector3(6000, 500, 1000), 1, 0);
-	    pSystem->addForceGenerator(particleDragGenerator, true);
-		particleDragGenerator->setDuration(3);
-		break;
-	case 'K':
-		if (!pausa)
-		{
-			int k1, k2;
-			std::cout << "Setea K SpringFG_1:\n ";
-			std::cin >> k1;
-			pSystem->getSprinFG_1()->setK(k1);
-
-			std::cout << "Setea K SpringFG_2:\n ";
-			std::cin >> k2;
-			pSystem->getSprinFG_2()->setK(k2);
-		}
-		break;
-	case 'P':
-		pausa = !pausa;
-		break;
-	default:
-		break;
+		case ' ':
+			break;
+		default:
+			break;
 	}
 }
 
@@ -290,8 +190,63 @@ void onCollision(physx::PxActor* actor1, physx::PxActor* actor2)
 {
 	PX_UNUSED(actor1);
 	PX_UNUSED(actor2);
+
+	// Comprobamos las colisiones de las balas con las entidades del juego
+	pSystem->checkColissionsWithBullets(score, actor1, actor2, bulletList);
 }
 
+void shoot()
+{
+	// Desactivamos disparo
+	canShoot = false;
+	// Creamos bala
+	RigidSolid* bullet = new RigidSolid({ 0,0,0 }, Dynamic, 1, gPhysics, gScene, 5, Sphere, 1, {200,200,0,1});
+	bullet->setVel({ (GetCamera()->getMousePos().x / 5) * 500,
+		(GetCamera()->getMousePos().y / 5) * 500, -1 * 500 });
+	bulletList.push_back(bullet);
+	// Añadimos la bala al sistema de particulas
+	pSystem->addParticleToList(bullet);
+}
+
+void mouseInput(int button, int state, int x, int y)
+{
+	// Si pulsamos click izquierdo
+	if (button == 0)
+	{
+		switch (estadoJuego)
+		{
+		case Intro:
+			// Al iniciar, para pasar al siguiente estado habrá que pulsar el click izq
+			estadoJuego = Juego;
+			// Creamos el escenario del juego
+			setupGaussianGenerator();
+			createBouyancyObstacles();
+			break;
+		case Juego:
+			// Activamos el sistema de particulas si está desactivado
+			if (!pSystem->getActive())
+			{
+				pSystem->setActive(true);
+				setupGaussianGenerator();
+			}
+			// Si podemos disparar, añadimos una bala a la lista de balas
+			if (canShoot) 
+			{
+				shoot();
+			}
+			break;
+		case Final:
+			// Reiniciamos juego
+			estadoJuego = Juego;
+			canShoot = false;
+			break;
+		default:
+			break;
+		}
+	}
+	PX_UNUSED(state);
+	PX_UNUSED(button);
+}
 
 int main(int, const char*const*)
 {

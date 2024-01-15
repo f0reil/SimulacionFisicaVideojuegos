@@ -1,8 +1,9 @@
 #include "RigidSolid.h"
 #include "ParticleGenerator.h"
 
-RigidSolid::RigidSolid(Vector3 pos, Type type, double mass, physx::PxPhysics* gPhysics, physx::PxScene* gScene,double timeLife, Geometry forma, int scale, Vector4 color)
-	: Entity(timeLife, forma, scale, color), gPhysics(gPhysics), gScene(gScene)
+RigidSolid::RigidSolid(Vector3 pos, Type type, double mass, physx::PxPhysics* gPhysics, 
+	physx::PxScene* gScene,double timeLife, Geometry forma, int scale, Vector4 color, bool isStatic)
+	: Entity(timeLife, forma, scale, color, false, isStatic), gPhysics(gPhysics), gScene(gScene)
 {
 	m = mass;
 	posI = pos;
@@ -10,13 +11,13 @@ RigidSolid::RigidSolid(Vector3 pos, Type type, double mass, physx::PxPhysics* gP
 	switch (type)
 	{
 	case Static:
-		_solidStatic = gPhysics->createRigidStatic(physx::PxTransform(pos));
+		_actor = _solidStatic = gPhysics->createRigidStatic(physx::PxTransform(pos));
 		_solidStatic->attachShape(*entShape);
 		gScene->addActor(*_solidStatic);
 		renderItem = new RenderItem(entShape, _solidStatic, colorP);
 		break;
 	case Dynamic:
-		_solidDynamic = gPhysics->createRigidDynamic(physx::PxTransform(pos));
+		_actor = _solidDynamic = gPhysics->createRigidDynamic(physx::PxTransform(pos));
 		_solidDynamic->attachShape(*entShape);
 		physx::PxRigidBodyExt::updateMassAndInertia(*_solidDynamic, physx::PxReal(m / getVolumen()));
 		gScene->addActor(*_solidDynamic);

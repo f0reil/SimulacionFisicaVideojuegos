@@ -3,7 +3,7 @@
 #include "ecs.h"
 void Firework::integrate(double t)
 {
-	Entity::integrate(t);
+	Particle::integrate(t);
 }
 Entity* Firework::clone() const
 {

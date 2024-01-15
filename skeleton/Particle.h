@@ -7,7 +7,7 @@ class Particle: public Entity
 public:
 	Particle(Vector3 pos, Vector3 velR, Vector3 velS, Vector3 ac,
 		double damping, double mass, double gravity, double timeLife, Geometry forma = Sphere,
-		int scale = 5, Vector4 color = { 255, 250, 0, 1 }, bool proyectil = false);
+		float scale = 5, Vector4 color = { 255, 250, 0, 1 }, bool proyectil = false, bool firework = false);
 	virtual ~Particle();
 	virtual void integrate(double t);
 	virtual Entity* clone() const;
@@ -32,12 +32,12 @@ public:
 
 	virtual std::list<Entity*> getGeneratedParticles();
 
+	inline bool isFireWork() { return fireworkParticle; };
 protected:
 	Vector3 velo;
 	Vector3 a;
 	Vector3 posP, dirP, velRP, velS, acP;
 	physx::PxTransform pose;
-	
 	
 	double d, gSim, gReal;
 

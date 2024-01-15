@@ -284,6 +284,7 @@
     <ClInclude Include="core.hpp" />
     <ClInclude Include="ecs.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="estados.h" />
     <ClInclude Include="ExplosionForceGenerator.h" />
     <ClInclude Include="Firework.h" />
     <ClInclude Include="FireworkGenerator.h" />

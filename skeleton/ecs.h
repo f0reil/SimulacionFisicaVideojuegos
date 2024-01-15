@@ -14,7 +14,7 @@ namespace proyectil
 
 	static proyectilP generico = { Vector3(0, 0, 0), Vector3(-10,10,-10), Vector3(0,10,0), 0, 1};
 
-	static proyectilP bala = { Vector3(300, 0, 0),Vector3(80, 0, 0), Vector3(0,0,0), 0.2, 0.998 };
+	static proyectilP bala = { Vector3(0, 0, -10),Vector3(0, 0, -3), Vector3(0,0,0), 0.2, 0.998 };
 	
 	static proyectilP canion = {Vector3(1800, 0, 0),Vector3(200, 0, 0), Vector3(0,0,0), 2500, 0.998};
 }
@@ -28,7 +28,7 @@ namespace models
 		int scale;
 	};
 
-	static modelInfo uniform1 = { 0.98, {1,0,1,1} , 2};
+	static modelInfo uniform1 = { 0.98, {1,0,1,1} , 5};
 	static modelInfo uniform2 = { 0.5, {0.4, 0.4, 0.8, 1} };
 	static modelInfo gaus1 = { 0.98, {0, 0.2, 1, 1}, 1 };
 	static modelInfo gaus2 = { 0.7, {0, 0.1, 0.8, 1}, 1 };

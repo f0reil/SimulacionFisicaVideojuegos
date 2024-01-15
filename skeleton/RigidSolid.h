@@ -6,7 +6,8 @@ enum Type {Static, Dynamic};
 class RigidSolid : public Entity
 {
 public:
-	RigidSolid(Vector3 pos, Type type,double mass, physx::PxPhysics* gPhysics, physx::PxScene* gScene, double timeLife, Geometry forma, int scale, Vector4 color);
+	RigidSolid(Vector3 pos, Type type,double mass, physx::PxPhysics* gPhysics, physx::PxScene* gScene, 
+		double timeLife, Geometry forma, int scale, Vector4 color, bool isStatic = false);
 	~RigidSolid() {};
 
 	virtual void integrate(double t);
@@ -87,12 +88,37 @@ public:
 	};
 
 	virtual std::list<Entity*> getGeneratedParticles();
+
+	inline physx::PxRigidActor* getActor() { return _actor; };
+
+	void inline clearAllForces()
+	{
+		if (type == Dynamic)
+		{
+			_solidDynamic->clearForce(physx::PxForceMode::eFORCE);
+			_solidDynamic->clearForce(physx::PxForceMode::eACCELERATION);
+			_solidDynamic->clearForce(physx::PxForceMode::eIMPULSE);
+			_solidDynamic->clearForce(physx::PxForceMode::eVELOCITY_CHANGE);
+		}
+	}
+
+	virtual inline void setRot(physx::PxQuat q) {
+		if (type == Dynamic)
+		{
+			auto tr = _solidDynamic->getGlobalPose();
+			tr.q = q;
+			_solidDynamic->setGlobalPose(tr);
+		}
+	}
+
 protected:
 	physx::PxPhysics* gPhysics;
 	physx::PxScene* gScene;
 
 	physx::PxRigidStatic* _solidStatic = nullptr;
 	physx::PxRigidDynamic* _solidDynamic = nullptr;
+
+	physx::PxRigidActor* _actor = nullptr;
 
 	Type type;
 };

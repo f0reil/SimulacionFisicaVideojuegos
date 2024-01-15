@@ -2,8 +2,9 @@
 #include "ParticleGenerator.h"
 #include <iostream>
 Particle::Particle(Vector3 pos, Vector3 velR, Vector3 velS, Vector3 ac,
-	double damping, double mass, double gravity, double timeLife, Geometry forma, int scale, Vector4 color, bool proyectil)
-	: Entity (timeLife, forma, scale, color)
+	double damping, double mass, double gravity, double timeLife, Geometry forma, float scale, Vector4 color, 
+	bool proyectil, bool firework)
+	: Entity (timeLife, forma, scale, color, proyectil, firework)
 {
 	// PROYECTIL-------------------
 	if (proyectil)
@@ -12,10 +13,10 @@ Particle::Particle(Vector3 pos, Vector3 velR, Vector3 velS, Vector3 ac,
 	//this->a = ac + Vector3(0, gravity, 0);
 
 		// Calculamos masa simulada------------------------
-		m = mass * pow((velR.x / velS.x), 2);
+		m = mass * pow((velR.z / velS.z), 2);
 
 		// Calculamos gravedad simulada--------------------
-		//gSim = -gravity * pow(velS.x / velR.x, 2);
+		gSim = -gravity * pow(velS.x / velR.x, 2);
 	}
 	else
 	// PARTICULA

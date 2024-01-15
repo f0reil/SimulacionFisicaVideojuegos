@@ -4,8 +4,8 @@
 class UniformParticleGenerator : public ParticleGenerator
 {
 public:
-	UniformParticleGenerator(std::string name, Vector3 mPos, Vector3 dPos, Vector3 mVel, Vector3 dVel, int numP = 100, bool input = false) 
-		: ParticleGenerator(name, mPos, mVel, numP, input), gen(std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count()))
+	UniformParticleGenerator(std::string name, Vector3 mPos, Vector3 dPos, Vector3 mVel, Vector3 dVel, int numP = 100, bool input = false, double time = 0.1f) 
+		: ParticleGenerator(name, mPos, mVel, numP, input, time), gen(std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count()))
 	{
 		_vel_width = dVel / 2;
 		_pos_width = dPos / 2;

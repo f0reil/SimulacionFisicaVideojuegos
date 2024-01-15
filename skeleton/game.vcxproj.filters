@@ -59,6 +59,7 @@
     <ClInclude Include="BouyancyForceGenerator.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="RigidSolid.h" />
+    <ClInclude Include="estados.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Render">
