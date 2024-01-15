@@ -1,8 +1,7 @@
 #include "Entity.h"
 
-Entity::Entity(double timeLife, Geometry forma, float scale, Vector4 color, bool proyect, bool isHold, bool isFirework)
+Entity::Entity(double timeLife, Geometry forma, float scale, Vector4 color, bool proyect, bool isHold)
 {
-	fireworkParticle = isFirework;
 	hold = isHold;
 	formaP = forma;
 	scaleP = scale;
@@ -18,8 +17,8 @@ Entity::Entity(double timeLife, Geometry forma, float scale, Vector4 color, bool
 		entShape = CreateShape(physx::PxBoxGeometry(Vector3(scaleP, scaleP, scaleP)/2));
 		break;
 	case Liquid:
-		entShape = CreateShape(physx::PxBoxGeometry(Vector3(40, 4.5, 10)));
-		colorP = Vector4(0, 255, 255, 1);
+		entShape = CreateShape(physx::PxBoxGeometry(Vector3(60, 4.5, 10)));
+		colorP = Vector4(0.8, 0.0, 1.0, 1);
 		break;
 	case RectangleBox:
 		if (hold)
@@ -32,6 +31,13 @@ Entity::Entity(double timeLife, Geometry forma, float scale, Vector4 color, bool
 		{
 			entShape = CreateShape(physx::PxBoxGeometry(Vector3(scaleP / 2, scaleP, scaleP / 2)));
 		}
+		break;
+	case RectangleBox2:
+		entShape = CreateShape(physx::PxBoxGeometry(Vector3(scaleP, scaleP/2, scaleP / 2)));
+		break;
+	case Grass:
+		entShape = CreateShape(physx::PxBoxGeometry(Vector3(150, 4.5, 60)));
+		colorP = Vector4(0, 1.0, 0.7, 1);
 		break;
 	}
 

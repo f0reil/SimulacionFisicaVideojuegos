@@ -5,13 +5,13 @@
 #include <iostream>
 class ParticleGenerator;
 
-enum Geometry { Sphere, Box, Liquid, RectangleBox };
+enum Geometry { Sphere, Box, Liquid, RectangleBox, RectangleBox2, Grass };
 
 class Entity
 {
 public:
 	Entity(double timeLife, Geometry forma = Sphere,
-		float scale = 5, Vector4 color = { 255, 250, 0, 1 }, bool proyect = false, bool isHold = false, bool isFirework = false);
+		float scale = 5, Vector4 color = { 255, 250, 0, 1 }, bool proyect = false, bool isHold = false);
 	virtual ~Entity();
 	virtual void integrate(double t);
 	virtual Entity* clone() const = 0;
@@ -70,7 +70,6 @@ public:
 
 	inline Geometry getForma() { return formaP; };
 
-	inline bool isFirework() { return fireworkParticle; };
 protected:
 	Vector4 colorP;
 	RenderItem* renderItem;
@@ -83,8 +82,6 @@ protected:
 	bool generatesOnDeath = false, proyectil = false, hold = false;
 
 	Geometry formaP;
-
-	bool fireworkParticle = false;
 
 	physx::PxShape* entShape;
 };

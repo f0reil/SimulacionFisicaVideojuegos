@@ -51,6 +51,8 @@
 extern std::string display_text;
 extern Estados estadoJuego;
 extern double tiempoRestante;
+extern double tiempoRestanteFinal;
+extern bool enableFinal;
 extern int score;
 
 namespace Snippets

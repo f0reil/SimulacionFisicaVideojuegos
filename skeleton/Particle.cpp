@@ -3,8 +3,8 @@
 #include <iostream>
 Particle::Particle(Vector3 pos, Vector3 velR, Vector3 velS, Vector3 ac,
 	double damping, double mass, double gravity, double timeLife, Geometry forma, float scale, Vector4 color, 
-	bool proyectil, bool firework)
-	: Entity (timeLife, forma, scale, color, proyectil, firework)
+	bool proyectil)
+	: Entity (timeLife, forma, scale, color, proyectil)
 {
 	// PROYECTIL-------------------
 	if (proyectil)

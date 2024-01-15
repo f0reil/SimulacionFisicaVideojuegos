@@ -61,9 +61,9 @@ public:
 			}
 		}
 	}
-	inline void addExplosion()
+	inline void addExplosion(Vector3 centro)
 	{
-		explosionForceGenerator = new ExplosionForceGenerator(Vector3(0,-20,-100), 500, 1000000, 20, 2);
+		explosionForceGenerator = new ExplosionForceGenerator(centro, 500, 1000000, 20, 2);
 		addForceGenerator(explosionForceGenerator);
 		for (Entity* p : _particles)
 		{
@@ -73,7 +73,6 @@ public:
 	void generateSpringForce();
 	void generateSpringForceRigidSolid(physx::PxPhysics* gPhysics, physx::PxScene* gScene);
 	void generateAnchoredForce();
-	//void generateBuoyancyForce();
 
 	void generateBuoyancyForce(physx::PxPhysics* gPhysics, physx::PxScene* gScene);
 	inline void addBouyancyForces(BouyancyForceGenerator* b, Entity* e)
@@ -85,13 +84,9 @@ public:
 	inline SpringForceGenerator* getSprinFG_1() { return f1; };
 	inline SpringForceGenerator* getSprinFG_2() { return f2; };
 
-	inline void addParticleToList(Entity* p, bool bullet = false) 
+	inline void addParticleToList(Entity* p) 
 	{ 
 		_particles.push_back(p);
-		if (bullet)
-		{
-			_bulletParticles.push_back(p);
-		}
 	};
 
 	void deleteLists();
@@ -107,17 +102,16 @@ public:
 		++score;
 	}
 
-	void createFireWork();
+	void createFireWork(Vector3 mPos, Vector3 pos, int g, double t, int numModel);
 
-	inline void Fireworks()
+	inline void Fireworks(Vector3 mPos, Vector3 pos, int g, double t, int numModel)
 	{
-		createFireWork();
+		createFireWork(mPos, pos, g, t, numModel);
 		shootFirework();
 	}
 
 private:
 	std::list<Entity*> _particles;
-	std::list<Entity*> _bulletParticles;
 	std::list<ParticleGenerator*> _particles_generator;
 	std::unordered_map<std::string, ParticleGenerator*> _pGenerator_map;
 
@@ -134,6 +128,7 @@ private:
 
 	std::list<BouyancyForceGenerator*> _bouyancy_force_generators;
 	std::list<Entity*> _bouyancy_particles;
+	Particle* liquid = nullptr;
 
 	bool active = true;
 };

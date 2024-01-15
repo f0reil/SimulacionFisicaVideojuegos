@@ -15,7 +15,6 @@ protected:
 	float _height;
 	float _volumen;
 	float _liquid_density;
-	float _gravity = 9.8;
 
 	Entity* _liquid_particle;
 };

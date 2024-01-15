@@ -26,5 +26,4 @@ void BouyancyForceGenerator::updateForce(Entity* particle, double t)
 
 BouyancyForceGenerator::~BouyancyForceGenerator()
 {
-	delete _liquid_particle;
 }

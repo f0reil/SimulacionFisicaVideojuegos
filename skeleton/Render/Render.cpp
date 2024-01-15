@@ -263,7 +263,7 @@ void setupDefaultWindow(const char *name)
 void setupDefaultRenderState()
 {
 	// Setup default render states
-	glClearColor(0.3f, 0.4f, 0.5f, 1.0);
+	glClearColor(0.0f, 0.4f, 0.5f, 1.0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -290,7 +290,10 @@ void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNe
 
 	// Display text, siempre lo renderizamos
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+	glDisable(GL_LIGHTING);
 	drawText(display_text, 0, 0);
+	glEnable(GL_LIGHTING);
 
 	// Render de los estados del juego
 	switch (estadoJuego)
@@ -426,35 +429,52 @@ void drawText(const std::string& text, int x, int y)
 
 void renderIntro()
 {
-	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(1.0f, 0.8f, 1.0f, 1.0f);
+
+	glDisable(GL_LIGHTING);
+	glColor4f(0.9f, 0.9f, 1.0f, 1.0f);
 	drawText("¡Bienvenido a Campo de Tiro!", 220, 350);
 	drawText("Acierta a todos los blancos posibles y gana la mayor puntuación.", 160, 335);
-	glColor4f(7.0f, 0.0f, 7.0f, 1.0f);
-	drawText("CLICK PARA EMPEZAR", 230, 130);
+	glColor4f(1.0f, 0.05f, 0.0f, 1.0f);
+	drawText("CLICK PARA EMPEZAR", 230, 280);
+	glColor4f(0.9f, 0.9f, 1.0f, 1.0f);
+	drawText("Controles: Apunta con el raton y dispara con el click izquierdo", 160, 220);
+	glColor4f(1.0f, 0.2f, 0.0f, 1.0f);
+	drawText("Cuidado con los obstaculos!", 220, 190);
+	glEnable(GL_LIGHTING);
+
 }
 
 void renderHUD()
 {
-	glColor4f(0.0f, 8.0f, 0.0f, 1.0f);
+	glClearColor(0.76f, 0.96f, 0.98f, 1.0);
+
+	glDisable(GL_LIGHTING);
+	glColor4f(1.0f, 0.5f, 0.0f, 1.0f);
 	drawText("Score: " + std::to_string(score), 10, 490);
-	drawText("Tiempo: " + std::to_string((int)tiempoRestante), 480, 490);
+	drawText("Tiempo: " + std::to_string((int)tiempoRestante), 470, 490);
+	glEnable(GL_LIGHTING);
 
-	/*if (rifleSelected) glColor4f(7.0f, 0.0f, 0.0f, 1.0f);
-	else glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-	drawText("RIFLE", 20, 45);
-
-	if (!rifleSelected) glColor4f(7.0f, 0.0f, 0.0f, 1.0f);
-	else glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-	drawText("SHOTGUN", 20, 30);*/
 }
 
 void renderEnd()
 {
-	glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-	drawText("¡Se acabo el tiempo!", 220, 350);
-	drawText("Puntuacion: " + std::to_string(score), 160, 335);
-	glColor4f(7.0f, 0.0f, 7.0f, 1.0f);
-	drawText("CLICK PARA VOLVER A JUGAR", 230, 130);
+	glClearColor(0.96f, 0.96f, 0.98f, 1.0);
+
+	glDisable(GL_LIGHTING);
+	glColor4f(1.0f, 1.0f, 0.8f, 1.0f);
+	drawText("¡Se acabo el tiempo!", 228, 350);
+	drawText("Puntuacion: " + std::to_string(score), 235, 325);
+	
+	if(!enableFinal && tiempoRestanteFinal >=1)drawText(std::to_string((int)tiempoRestanteFinal), 255, 250);
+	else
+	{
+		glColor4f(7.0f, 0.0f, 7.0f, 1.0f);
+		drawText("CLIK PARA", 243, 180);
+		drawText("JUGAR DE NUEVO", 235, 170);
+	}
+	glEnable(GL_LIGHTING);
+
 }
 
 

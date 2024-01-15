@@ -20,7 +20,8 @@ void Firework::death()
 		_particle_generator->setPos(pose.p);
 		if (scaleP > 1) scaleP=scaleP - 1;
 		// Seteamos modelo del generador
-		auto model = models::modelsFirework[rand() % models::modelsFirework.size()];
+		//auto model = models::modelsFirework[rand() % models::modelsFirework.size()];
+		auto model = models::modelsFirework[g-1];
 		Firework* f = new Firework(g - 1, pose.p, { 0,0,0 }, velo, { 0,0,0 }, model.damping, m, gReal, (rand() % 100) / 100.0, Sphere, model.scale, model.color);
 		f->eraseVisualModel();
 		_particle_generator->setParticle(f);

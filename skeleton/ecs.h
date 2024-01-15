@@ -34,8 +34,11 @@ namespace models
 	static modelInfo gaus2 = { 0.7, {0, 0.1, 0.8, 1}, 1 };
 	static modelInfo firework1 = { 0.98, {1, 0.2, 0.2, 1}, 2 };
 	static modelInfo firework2 = { 0.98, {1, 0.1, 0.5, 1}, 1 };
+	static modelInfo firework3 = { 0.98, {1, 0.1, 0.8, 1}, 1 };
+	static modelInfo firework4 = { 0.98, {1, 0.1, 1.0, 1}, 1 };
+	static modelInfo firework5 = { 0.98, {1, 0.6, 1.0, 1}, 1 };
 
 	static std::vector<modelInfo> modelsUniform = { uniform1, uniform2 };
 	static std::vector<modelInfo> modelsGuassian = { gaus1, gaus2 };
-	static std::vector<modelInfo> modelsFirework = { firework1, firework2 };
+	static std::vector<modelInfo> modelsFirework = { firework1, firework2, firework3,firework4, firework5 };
 }

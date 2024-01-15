@@ -22,7 +22,7 @@
 #include <iostream>
 #include "estados.h"
 
-std::string display_text = "Campo de Tiro - Proyecto Final, Paula Lopez";
+std::string display_text = "Apunta y Atina - Proyecto Final, Paula Lopez";
 
 using namespace physx;
 
@@ -42,10 +42,6 @@ PxScene*				gScene      = NULL;
 ContactReportCallback gContactReportCallback;
 
 
-// SOLIDO RIGIDO ------------------------------------------------------
-// Suelo
-physx::PxRigidStatic* _staticFloor = nullptr;
-RenderItem* floorRenderItem;
 
 // PROYECTO FINAL ---------------------------------------------------
 // Variables flujo de juego
@@ -53,8 +49,6 @@ Estados estadoJuego = Intro;
 int score = 0;
 // Sistema de particulas
 ParticleSystem* pSystem = nullptr;
-// Generadores de fuerza -------------------------------------------- 
-GravityForceGenerator* gravityForceGenerator = nullptr;
 // Lista de balas
 std::list<Entity*> bulletList;
 // Cooldown balas
@@ -62,8 +56,29 @@ bool canShoot = false;
 float cooldownShoot = 0.25f;
 float timer = 0.0f;
 // Tiempo de juego
-const double tiempoPartida = 10;
+const double tiempoPartida = 30;
 double tiempoRestante = tiempoPartida;
+// Tiempo pantalla final
+const double tiempoPantallaFinal = 4;
+double tiempoRestanteFinal = tiempoPantallaFinal;
+bool enableFinal = false;
+// Decoración
+Particle* grass = nullptr;
+Particle* rec = nullptr;
+
+void decoracion(bool estadoFinal = false)
+{
+	if (!estadoFinal)
+	{
+		rec = new Particle({ 0.0, 0.0, -20.0 }, { 0.0,0.0,0.0 }, { 0.0,0.0,0.0 }, { 0.0,0.0,0.0 },
+			0.85, 0.0, 0.0, 60, RectangleBox2, 10, { 1.0,1.0,1.0,1.0 });
+	}
+	else
+	{
+		rec = new Particle({ 0.0, 0.0, -40.0 }, { 0.0,0.0,0.0 }, { 0.0,0.0,0.0 }, { 0.0,0.0,0.0 },
+			0.85, 0.0, 0.0, 60, RectangleBox, 10, { 1.0,0.5,1.0,1.0 });
+	}
+}
 
 // Initialize physics engine
 void initPhysics(bool interactive)
@@ -94,6 +109,18 @@ void initPhysics(bool interactive)
 	// SISTEMA DE PARTÍCULAS-------------------------------
 	pSystem = new ParticleSystem();
 
+	// Decoración intro
+	//-------------------------------------------------------
+	decoracion();
+
+}
+void deleteDecoracion()
+{
+	if (rec != nullptr)
+	{
+		delete rec;
+		rec = nullptr;
+	}
 }
 
 void setupGaussianGenerator()
@@ -114,6 +141,16 @@ void createBouyancyObstacles()
 	pSystem->generateBuoyancyForce(gPhysics, gScene);
 }
 
+void setGrass()
+{
+	grass = new Particle({ 0.0, -20.0, -60.0 }, { 0.0,0.0,0.0 }, { 0.0,0.0,0.0 }, { 0.0,0.0,0.0 },
+		0.85, 0.0, 0.0, 60, Grass);
+}
+
+void deleteGrass()
+{
+	delete grass;
+}
 // Function to configure what happens in each step of physics
 // interactive: true if the game is rendering, false if it offline
 // t: time passed since last call in milliseconds
@@ -142,9 +179,22 @@ void stepPhysics(bool interactive, double t)
 	if (tiempoRestante <= 0)
 	{
 		tiempoRestante = tiempoPartida;
+		enableFinal = false;
 		estadoJuego = Final;
+		decoracion(true);
 		pSystem->deleteParticles();
-		pSystem->Fireworks();
+		deleteGrass();
+		pSystem->Fireworks({10, -20, -50}, { 10, -10, -50 }, 3, 0.5, 4);
+	}
+	// Tiempo pantalla final
+	if (estadoJuego == Final && !enableFinal)
+	{
+		tiempoRestanteFinal -= t;
+	}
+	if (tiempoRestanteFinal <= 0)
+	{
+		tiempoRestanteFinal = tiempoPantallaFinal;
+		enableFinal = true;
 	}
 	gScene->simulate(t);
 	gScene->fetchResults(true);
@@ -200,9 +250,9 @@ void shoot()
 	// Desactivamos disparo
 	canShoot = false;
 	// Creamos bala
-	RigidSolid* bullet = new RigidSolid({ 0,0,0 }, Dynamic, 1, gPhysics, gScene, 5, Sphere, 1, {200,200,0,1});
-	bullet->setVel({ (GetCamera()->getMousePos().x / 5) * 500,
-		(GetCamera()->getMousePos().y / 5) * 500, -1 * 500 });
+	RigidSolid* bullet = new RigidSolid({ 0,0,0 }, Dynamic, 1, gPhysics, gScene, 1, Sphere, 1, {200,200,0,1});
+	bullet->setVel({ (GetCamera()->getMousePos().x / 5) * 700,
+		(GetCamera()->getMousePos().y / 5) * 700, -1 * 700 });
 	bulletList.push_back(bullet);
 	// Añadimos la bala al sistema de particulas
 	pSystem->addParticleToList(bullet);
@@ -218,9 +268,11 @@ void mouseInput(int button, int state, int x, int y)
 		case Intro:
 			// Al iniciar, para pasar al siguiente estado habrá que pulsar el click izq
 			estadoJuego = Juego;
+			deleteDecoracion();
 			// Creamos el escenario del juego
 			setupGaussianGenerator();
 			createBouyancyObstacles();
+			setGrass();
 			break;
 		case Juego:
 			// Activamos el sistema de particulas si está desactivado
@@ -228,6 +280,8 @@ void mouseInput(int button, int state, int x, int y)
 			{
 				pSystem->setActive(true);
 				setupGaussianGenerator();
+				createBouyancyObstacles();
+				setGrass();
 			}
 			// Si podemos disparar, añadimos una bala a la lista de balas
 			if (canShoot) 
@@ -236,9 +290,14 @@ void mouseInput(int button, int state, int x, int y)
 			}
 			break;
 		case Final:
-			// Reiniciamos juego
-			estadoJuego = Juego;
-			canShoot = false;
+			if (enableFinal)
+			{
+				// Reiniciamos juego
+				deleteDecoracion();
+				estadoJuego = Juego;
+				canShoot = false;
+				score = 0;
+			}
 			break;
 		default:
 			break;
