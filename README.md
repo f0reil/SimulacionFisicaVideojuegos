@@ -1,8 +1,8 @@
 # SimulacionFisicaVideojuegos
-Repositorio de las prácticas de la asignatura de Simulación Física de Videojuegos
 
-En la carpeta skeleton estará vuestro código fuente
+## Manual de uso proyecto final:
 
-Necesitaréis además descomprimir el archivo que se indica a continuación en la raíz del repositorio:
+El único input necesario será el click izquierdo del ratón. Con él se podrá pasar de pantalla desde el menú inicial a la partida y desde el menú final a partida cuando se indique. 
+En la partida se podrá lanzar proyectiles a la dirección deseada apuntando con el propio puntero del ratón.
 
-Carpetas bin y common https://ucomplutense-my.sharepoint.com/:u:/g/personal/davalejo_ucm_es/EZcsdyIoqTFOrF4hdfkVYk0BJZ9IycJ3QqXQFwaXVrlSKg?e=pfs6IO
+
