@@ -239,7 +239,7 @@ void ParticleSystem::checkColissionsWithBullets(int& score, physx::PxActor* acto
 			if (bala->getActor() != target->getActor() && (bala->getActor() == actor1 || bala->getActor() == actor2) && (target->getActor() == actor1 || target->getActor() == actor2))
 			{
 				// Actualizamos la puntuacion
-				if (bala->getPos().p.y < 10 && bala->getPos().p.y > -15) score += 5;
+				if (bala->getPos().p.y < 5 && bala->getPos().p.y > -10) score += 5;
 				else if (bala->getPos().p.y > 10) updateScore(score);
 
 				// Borramos bala

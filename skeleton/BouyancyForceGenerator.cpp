@@ -19,7 +19,7 @@ void BouyancyForceGenerator::updateForce(Entity* particle, double t)
 	{
 		immersed = (h0 - h) / _height + 0.5;
 	}
-	f.y = _liquid_density * _volumen * immersed * 9.8;
+	f.y = _liquid_density * _volumen * immersed * 1.3;
 
 	particle->addForce(f);
 }
